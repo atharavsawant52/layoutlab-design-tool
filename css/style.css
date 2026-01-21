@@ -6,6 +6,10 @@ body {
   color: #e6e6e6;
   background: #111;
 }
+
+body.is-dragging {
+  user-select: none;
+}
 .app {
   min-height: 100vh;
   display: flex;
@@ -84,16 +88,33 @@ body {
   position: relative;
   overflow: hidden;
   min-height: 0;
+  touch-action: none;
 }
 
 .ll-element {
   position: absolute;
+  touch-action: none;
 }
 
 .ll-element.is-selected {
   outline: 2px solid #22c55e;
   outline-offset: 2px;
 }
+
+.ll-resize-handle {
+  position: absolute;
+  width: clamp(10px, 2.2vw, 14px);
+  height: clamp(10px, 2.2vw, 14px);
+  background: #f8fafc;
+  border: 1px solid #111;
+  border-radius: 4px;
+  touch-action: none;
+}
+
+.ll-resize-handle[data-dir="tl"] { left: 0; top: 0; transform: translate(-50%, -50%); }
+.ll-resize-handle[data-dir="tr"] { right: 0; top: 0; transform: translate(50%, -50%); }
+.ll-resize-handle[data-dir="bl"] { left: 0; bottom: 0; transform: translate(-50%, 50%); }
+.ll-resize-handle[data-dir="br"] { right: 0; bottom: 0; transform: translate(50%, 50%); }
 
 .statusbar {
   height: 28px;
