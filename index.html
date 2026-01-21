@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LayoutLab</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="topbar" aria-label="Top toolbar">
+      <div class="topbar__left">
+        <span class="brand">LayoutLab</span>
+      </div>
+      <div class="topbar__center">
+
+      </div>
+      <div class="topbar__right">
+
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="panel panel--left" aria-label="Left panel">
+      </aside>
+
+      <main class="stage" aria-label="Design stage">
+        <div class="stage__canvas" id="canvas">
+    
+        </div>
+      </main>
+
+      <aside class="panel panel--right" aria-label="Right panel">
+
+      </aside>
+    </div>
+
+    <footer class="statusbar" aria-label="Status bar">
+      <span class="statusbar__text">Ready</span>
+    </footer>
+  </div>
+
+  <script src="./js/state.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>
