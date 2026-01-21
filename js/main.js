@@ -5,6 +5,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
   if (!canvas) return;
 
+  function getSelectedNode() {
+    var id = window.AppState.ui.selectedId;
+    if (!id) return null;
+    return canvas.querySelector('[data-element-id="' + id + '"]');
+  }
+
+  function clearSelection() {
+    var selectedNode = getSelectedNode();
+    if (selectedNode) selectedNode.classList.remove("is-selected");
+    window.AppState.ui.selectedId = null;
+  }
+
+  function selectById(id) {
+    if (!id) {
+      clearSelection();
+      return;
+    }
+
+    if (window.AppState.ui.selectedId === id) return;
+    clearSelection();
+
+    var node = canvas.querySelector('[data-element-id="' + id + '"]');
+    if (!node) return;
+    node.classList.add("is-selected");
+    window.AppState.ui.selectedId = id;
+  }
+
   function nextElementId() {
     window.AppState.counters.element += 1;
     return "el_" + window.AppState.counters.element;
@@ -39,6 +66,17 @@ document.addEventListener("DOMContentLoaded", function () {
     applyInlineStyles(node, model.styles);
     canvas.appendChild(node);
   }
+
+  canvas.addEventListener("pointerdown", function (e) {
+    var el = e.target.closest(".ll-element");
+    if (!el) {
+      if (e.target === canvas) clearSelection();
+      return;
+    }
+
+    var id = el.dataset.elementId;
+    selectById(id);
+  });
 
   function addElement(type) {
     var id = nextElementId();

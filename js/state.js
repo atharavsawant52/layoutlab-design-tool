@@ -2,7 +2,7 @@ window.AppState = {
   doc: null,
   elements: [],
   ui: {
-    selectedIds: [],
+    selectedId: null,
     tool: "select"
   },
   counters: {

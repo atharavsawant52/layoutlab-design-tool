@@ -90,6 +90,11 @@ body {
   position: absolute;
 }
 
+.ll-element.is-selected {
+  outline: 2px solid #22c55e;
+  outline-offset: 2px;
+}
+
 .statusbar {
   height: 28px;
   display: flex;
