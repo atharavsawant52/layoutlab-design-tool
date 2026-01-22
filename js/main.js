@@ -7,6 +7,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var propBg = document.getElementById("prop-bg");
   var propTextRow = document.getElementById("prop-text-row");
   var propText = document.getElementById("prop-text");
+  var exportJsonBtn = document.getElementById("export-json");
+  var exportHtmlBtn = document.getElementById("export-html");
   var rectBtn = document.getElementById("create-rect");
   var textBtn = document.getElementById("create-text");
 
@@ -15,6 +17,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var MIN_W = 40;
   var MIN_H = 24;
   var KEY_STEP = 5;
+  var STORAGE_KEY = "layoutlab.layout.v1";
+  var saveQueued = false;
 
   var resize = {
     active: false,
@@ -79,6 +83,239 @@ document.addEventListener("DOMContentLoaded", function () {
       var node = canvas.querySelector('[data-element-id="' + els[i].id + '"]');
       if (node) node.style.zIndex = String(i + 1);
     }
+  }
+
+  function pad2(n) {
+    return String(n).padStart(2, "0");
+  }
+
+  function fileStamp() {
+    var d = new Date();
+    return (
+      d.getFullYear() +
+      pad2(d.getMonth() + 1) +
+      pad2(d.getDate()) +
+      "-" +
+      pad2(d.getHours()) +
+      pad2(d.getMinutes()) +
+      pad2(d.getSeconds())
+    );
+  }
+
+  function downloadFile(filename, mime, content) {
+    var blob = new Blob([content], { type: mime });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () {
+      URL.revokeObjectURL(url);
+    }, 0);
+  }
+
+  function buildExportData() {
+    var els = window.AppState.elements;
+    var out = [];
+    for (var i = 0; i < els.length; i += 1) {
+      var m = els[i];
+      out.push({
+        id: m.id,
+        type: m.type,
+        x: m.x,
+        y: m.y,
+        width: m.width,
+        height: m.height,
+        styles: m.styles || {},
+        zIndex: i + 1,
+        text: m.type === "text" ? (m.text || "") : undefined,
+      });
+    }
+    return out;
+  }
+
+  function exportJson() {
+    var data = buildExportData();
+    var json = JSON.stringify(data, null, 2);
+    downloadFile("layoutlab-" + fileStamp() + ".json", "application/json", json);
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/\"/g, "&quot;");
+  }
+
+  function styleObjectToCss(styles) {
+    if (!styles) return "";
+    var keys = Object.keys(styles);
+    var out = "";
+    for (var i = 0; i < keys.length; i += 1) {
+      var k = keys[i];
+      var v = styles[k];
+      if (v === null || v === undefined || v === "") continue;
+      var prop = k.replace(/[A-Z]/g, function (m) {
+        return "-" + m.toLowerCase();
+      });
+      out += prop + ":" + String(v) + ";";
+    }
+    return out;
+  }
+
+  function exportHtml() {
+    var data = buildExportData();
+    var rect = canvas.getBoundingClientRect();
+    var w = Math.max(1, Math.round(rect.width));
+    var h = Math.max(1, Math.round(rect.height));
+
+    var body = "";
+    for (var i = 0; i < data.length; i += 1) {
+      var el = data[i];
+      var base =
+        "position:absolute;" +
+        "left:" + Math.round(el.x) + "px;" +
+        "top:" + Math.round(el.y) + "px;" +
+        "width:" + Math.round(el.width) + "px;" +
+        "height:" + Math.round(el.height) + "px;" +
+        "z-index:" + el.zIndex + ";";
+
+      var style = base + styleObjectToCss(el.styles);
+      var content = el.type === "text" ? escapeHtml(el.text || "") : "";
+      body += '<div style="' + style + '">' + content + "</div>";
+    }
+
+    var html =
+      "<!doctype html>" +
+      '<html lang="en">' +
+      "<head>" +
+      '<meta charset="utf-8" />' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1" />' +
+      "<title>LayoutLab Export</title>" +
+      "</head>" +
+      '<body style="margin:0;background:#0c0c0c;">' +
+      '<div style="position:relative;width:' +
+      w +
+      "px;height:" +
+      h +
+      'px;overflow:hidden;">' +
+      body +
+      "</div>" +
+      "</body>" +
+      "</html>";
+
+    downloadFile("layoutlab-" + fileStamp() + ".html", "text/html", html);
+  }
+
+  function saveLayout() {
+    var els = window.AppState.elements;
+    var out = [];
+
+    for (var i = 0; i < els.length; i += 1) {
+      var m = els[i];
+      out.push({
+        id: m.id,
+        type: m.type,
+        x: m.x,
+        y: m.y,
+        width: m.width,
+        height: m.height,
+        styles: m.styles || {},
+        zIndex: i + 1,
+        text: m.type === "text" ? (m.text || "") : undefined,
+      });
+    }
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(out));
+  }
+
+  function scheduleSave() {
+    if (saveQueued) return;
+    saveQueued = true;
+    requestAnimationFrame(function () {
+      saveQueued = false;
+      saveLayout();
+    });
+  }
+
+  function clearCanvasElements() {
+    var nodes = canvas.querySelectorAll(".ll-element");
+    for (var i = 0; i < nodes.length; i += 1) {
+      nodes[i].remove();
+    }
+  }
+
+  function clampModelToCanvas(model) {
+    var rect = canvas.getBoundingClientRect();
+    var w = clamp(Math.round(model.width || MIN_W), MIN_W, Math.max(MIN_W, rect.width));
+    var h = clamp(Math.round(model.height || MIN_H), MIN_H, Math.max(MIN_H, rect.height));
+    var maxX = Math.max(0, rect.width - w);
+    var maxY = Math.max(0, rect.height - h);
+    model.x = clamp(Math.round(model.x || 0), 0, maxX);
+    model.y = clamp(Math.round(model.y || 0), 0, maxY);
+    model.width = w;
+    model.height = h;
+    if (!model.styles || typeof model.styles !== "object") model.styles = {};
+    return model;
+  }
+
+  function loadLayout() {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+
+    var parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch (e) {
+      return;
+    }
+
+    if (!Array.isArray(parsed)) return;
+
+    clearSelection();
+    removeResizeHandles();
+    window.AppState.elements.length = 0;
+    clearCanvasElements();
+
+    var items = parsed.slice().sort(function (a, b) {
+      return (a && a.zIndex ? a.zIndex : 0) - (b && b.zIndex ? b.zIndex : 0);
+    });
+
+    var maxCounter = window.AppState.counters.element;
+    for (var i = 0; i < items.length; i += 1) {
+      var it = items[i];
+      if (!it || !it.id || !it.type) continue;
+
+      var model = {
+        id: String(it.id),
+        type: it.type === "text" ? "text" : "rect",
+        x: Number(it.x) || 0,
+        y: Number(it.y) || 0,
+        width: Number(it.width) || (it.type === "text" ? 200 : 160),
+        height: Number(it.height) || (it.type === "text" ? 40 : 120),
+        styles: it.styles && typeof it.styles === "object" ? it.styles : {},
+      };
+
+      if (model.type === "text") model.text = typeof it.text === "string" ? it.text : "";
+
+      clampModelToCanvas(model);
+      window.AppState.elements.push(model);
+      renderElement(model);
+
+      var m = /^el_(\d+)$/.exec(model.id);
+      if (m) {
+        var n = Number(m[1]);
+        if (isFinite(n)) maxCounter = Math.max(maxCounter, n);
+      }
+    }
+
+    window.AppState.counters.element = maxCounter;
+    applyZIndices();
+    renderLayers();
+    syncPropertiesPanel();
   }
 
   function getLayerLabel(model) {
@@ -151,6 +388,7 @@ document.addEventListener("DOMContentLoaded", function () {
     swapElements(i, i + 1);
     applyZIndices();
     renderLayers();
+    scheduleSave();
   }
 
   function moveLayerBackward(id) {
@@ -159,6 +397,7 @@ document.addEventListener("DOMContentLoaded", function () {
     swapElements(i, i - 1);
     applyZIndices();
     renderLayers();
+    scheduleSave();
   }
 
   function toHexColor(v) {
@@ -415,6 +654,7 @@ document.addEventListener("DOMContentLoaded", function () {
     resize.id = null;
     resize.dir = null;
     document.body.classList.remove("is-dragging");
+    scheduleSave();
     e.preventDefault();
   }
 
@@ -472,6 +712,7 @@ document.addEventListener("DOMContentLoaded", function () {
     drag.pointerId = null;
     drag.id = null;
     document.body.classList.remove("is-dragging");
+    scheduleSave();
     e.preventDefault();
   }
 
@@ -560,6 +801,7 @@ document.addEventListener("DOMContentLoaded", function () {
     applyZIndices();
     renderLayers();
     syncPropertiesPanel();
+    scheduleSave();
   }
 
   function moveSelectedBy(dx, dy) {
@@ -723,6 +965,7 @@ document.addEventListener("DOMContentLoaded", function () {
     applyZIndices();
     renderLayers();
     syncPropertiesPanel();
+    scheduleSave();
   }
 
   if (rectBtn) {
@@ -737,7 +980,20 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  if (exportJsonBtn) {
+    exportJsonBtn.addEventListener("click", function () {
+      exportJson();
+    });
+  }
+
+  if (exportHtmlBtn) {
+    exportHtmlBtn.addEventListener("click", function () {
+      exportHtml();
+    });
+  }
+
   applyZIndices();
   renderLayers();
   syncPropertiesPanel();
+  loadLayout();
 });
