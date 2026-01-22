@@ -23,6 +23,10 @@
 
     <div class="workspace">
       <aside class="panel panel--left" aria-label="Left panel">
+        <div class="layers" aria-label="Layers">
+          <div class="layers__title">Layers</div>
+          <div class="layers__list" id="layers"></div>
+        </div>
       </aside>
 
       <main class="stage" aria-label="Design stage">
@@ -32,7 +36,29 @@
       </main>
 
       <aside class="panel panel--right" aria-label="Right panel">
-
+        <div class="props" aria-label="Properties">
+          <div class="props__title">Properties</div>
+          <form class="props__form" id="props-form">
+            <fieldset class="props__fieldset" id="props-fieldset" disabled>
+              <label class="props__row">
+                <span class="props__label">Width</span>
+                <input class="props__input" id="prop-width" type="number" min="0" step="1" inputmode="numeric" />
+              </label>
+              <label class="props__row">
+                <span class="props__label">Height</span>
+                <input class="props__input" id="prop-height" type="number" min="0" step="1" inputmode="numeric" />
+              </label>
+              <label class="props__row">
+                <span class="props__label">Background</span>
+                <input class="props__input" id="prop-bg" type="color" />
+              </label>
+              <label class="props__row" id="prop-text-row" hidden>
+                <span class="props__label">Text</span>
+                <input class="props__input" id="prop-text" type="text" />
+              </label>
+            </fieldset>
+          </form>
+        </div>
       </aside>
     </div>
 

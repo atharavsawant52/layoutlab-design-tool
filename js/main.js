@@ -1,5 +1,12 @@
 document.addEventListener("DOMContentLoaded", function () {
   var canvas = document.getElementById("canvas");
+  var layersRoot = document.getElementById("layers");
+  var propsFieldset = document.getElementById("props-fieldset");
+  var propWidth = document.getElementById("prop-width");
+  var propHeight = document.getElementById("prop-height");
+  var propBg = document.getElementById("prop-bg");
+  var propTextRow = document.getElementById("prop-text-row");
+  var propText = document.getElementById("prop-text");
   var rectBtn = document.getElementById("create-rect");
   var textBtn = document.getElementById("create-text");
 
@@ -7,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var MIN_W = 40;
   var MIN_H = 24;
+  var KEY_STEP = 5;
 
   var resize = {
     active: false,
@@ -63,6 +71,214 @@ document.addEventListener("DOMContentLoaded", function () {
       y: e.clientY - rect.top,
       rect: rect,
     };
+  }
+
+  function applyZIndices() {
+    var els = window.AppState.elements;
+    for (var i = 0; i < els.length; i += 1) {
+      var node = canvas.querySelector('[data-element-id="' + els[i].id + '"]');
+      if (node) node.style.zIndex = String(i + 1);
+    }
+  }
+
+  function getLayerLabel(model) {
+    if (!model) return "Element";
+    if (model.type === "text") return "Text";
+    return "Rectangle";
+  }
+
+  function renderLayers() {
+    if (!layersRoot) return;
+
+    var selectedId = window.AppState.ui.selectedId;
+    var els = window.AppState.elements;
+    layersRoot.innerHTML = "";
+
+    for (var i = els.length - 1; i >= 0; i -= 1) {
+      var model = els[i];
+      var row = document.createElement("div");
+      row.className = "layer-item" + (model.id === selectedId ? " is-active" : "");
+      row.dataset.id = model.id;
+
+      var label = document.createElement("div");
+      label.className = "layer-item__label";
+      label.textContent = getLayerLabel(model) + " • " + model.id;
+
+      var actions = document.createElement("div");
+      actions.className = "layer-item__actions";
+
+      var up = document.createElement("button");
+      up.type = "button";
+      up.className = "layer-btn";
+      up.dataset.action = "forward";
+      up.dataset.id = model.id;
+      up.textContent = "Up";
+
+      var down = document.createElement("button");
+      down.type = "button";
+      down.className = "layer-btn";
+      down.dataset.action = "backward";
+      down.dataset.id = model.id;
+      down.textContent = "Down";
+
+      actions.appendChild(up);
+      actions.appendChild(down);
+      row.appendChild(label);
+      row.appendChild(actions);
+      layersRoot.appendChild(row);
+    }
+  }
+
+  function getElementIndexById(id) {
+    var els = window.AppState.elements;
+    for (var i = 0; i < els.length; i += 1) {
+      if (els[i].id === id) return i;
+    }
+    return -1;
+  }
+
+  function swapElements(i, j) {
+    var els = window.AppState.elements;
+    var t = els[i];
+    els[i] = els[j];
+    els[j] = t;
+  }
+
+  function moveLayerForward(id) {
+    var i = getElementIndexById(id);
+    if (i < 0) return;
+    if (i >= window.AppState.elements.length - 1) return;
+    swapElements(i, i + 1);
+    applyZIndices();
+    renderLayers();
+  }
+
+  function moveLayerBackward(id) {
+    var i = getElementIndexById(id);
+    if (i <= 0) return;
+    swapElements(i, i - 1);
+    applyZIndices();
+    renderLayers();
+  }
+
+  function toHexColor(v) {
+    if (!v) return "";
+    if (typeof v !== "string") return "";
+    var s = v.trim();
+    if (s[0] === "#" && (s.length === 7 || s.length === 4)) return s;
+    return "";
+  }
+
+  function getSelectedModel() {
+    var id = window.AppState.ui.selectedId;
+    if (!id) return null;
+    return getElementModelById(id);
+  }
+
+  function syncPropertiesPanel() {
+    if (!propsFieldset) return;
+
+    var model = getSelectedModel();
+    if (!model) {
+      propsFieldset.disabled = true;
+      if (propWidth) propWidth.value = "";
+      if (propHeight) propHeight.value = "";
+      if (propBg) propBg.value = "";
+      if (propText) propText.value = "";
+      if (propTextRow) propTextRow.hidden = true;
+      return;
+    }
+
+    propsFieldset.disabled = false;
+    if (propWidth) propWidth.value = String(Math.round(model.width));
+    if (propHeight) propHeight.value = String(Math.round(model.height));
+
+    var bg = model.styles && model.styles.backgroundColor ? model.styles.backgroundColor : "";
+    var hex = toHexColor(bg);
+    if (propBg) propBg.value = hex || "#000000";
+
+    if (propTextRow) propTextRow.hidden = model.type !== "text";
+    if (model.type === "text" && propText) propText.value = model.text || "";
+    if (model.type !== "text" && propText) propText.value = "";
+  }
+
+  function setElementSize(id, w, h) {
+    var node = canvas.querySelector('[data-element-id="' + id + '"]');
+    if (node) {
+      node.style.width = toPx(w);
+      node.style.height = toPx(h);
+    }
+
+    var model = getElementModelById(id);
+    if (model) {
+      model.width = w;
+      model.height = h;
+    }
+  }
+
+  function applyPropertySize(kind, raw) {
+    var model = getSelectedModel();
+    if (!model) return;
+
+    var n = Number(raw);
+    if (!isFinite(n)) return;
+    var v = Math.max(0, Math.round(n));
+
+    var rect = canvas.getBoundingClientRect();
+    var canvasW = rect.width;
+    var canvasH = rect.height;
+
+    var maxW = Math.max(MIN_W, canvasW - model.x);
+    var maxH = Math.max(MIN_H, canvasH - model.y);
+
+    var w = model.width;
+    var h = model.height;
+    if (kind === "width") w = clamp(v, MIN_W, maxW);
+    if (kind === "height") h = clamp(v, MIN_H, maxH);
+    setElementSize(model.id, w, h);
+    syncResizeHandles();
+  }
+
+  function applyPropertyBg(value) {
+    var model = getSelectedModel();
+    if (!model) return;
+    if (!model.styles) model.styles = {};
+    model.styles.backgroundColor = value;
+    var node = canvas.querySelector('[data-element-id="' + model.id + '"]');
+    if (node) node.style.backgroundColor = value;
+  }
+
+  function applyPropertyText(value) {
+    var model = getSelectedModel();
+    if (!model) return;
+    if (model.type !== "text") return;
+    model.text = value;
+    var node = canvas.querySelector('[data-element-id="' + model.id + '"]');
+    if (node) node.textContent = value;
+  }
+
+  if (propWidth) {
+    propWidth.addEventListener("input", function (e) {
+      applyPropertySize("width", e.target.value);
+    });
+  }
+
+  if (propHeight) {
+    propHeight.addEventListener("input", function (e) {
+      applyPropertySize("height", e.target.value);
+    });
+  }
+
+  if (propBg) {
+    propBg.addEventListener("input", function (e) {
+      applyPropertyBg(e.target.value);
+    });
+  }
+
+  if (propText) {
+    propText.addEventListener("input", function (e) {
+      applyPropertyText(e.target.value);
+    });
   }
 
   function removeResizeHandles() {
@@ -321,6 +537,103 @@ document.addEventListener("DOMContentLoaded", function () {
     canvas.appendChild(node);
   }
 
+  function isTextEditingTarget(target) {
+    if (!target) return false;
+    if (target.isContentEditable) return true;
+    var tag = target.tagName ? target.tagName.toLowerCase() : "";
+    return tag === "input" || tag === "textarea" || tag === "select";
+  }
+
+  function removeElementById(id) {
+    var node = canvas.querySelector('[data-element-id="' + id + '"]');
+    if (node) node.remove();
+
+    var els = window.AppState.elements;
+    for (var i = 0; i < els.length; i += 1) {
+      if (els[i].id === id) {
+        els.splice(i, 1);
+        break;
+      }
+    }
+
+    if (resize.hostId === id) removeResizeHandles();
+    applyZIndices();
+    renderLayers();
+    syncPropertiesPanel();
+  }
+
+  function moveSelectedBy(dx, dy) {
+    var model = getSelectedModel();
+    if (!model) return;
+
+    var rect = canvas.getBoundingClientRect();
+    var maxX = Math.max(0, rect.width - model.width);
+    var maxY = Math.max(0, rect.height - model.height);
+    var nextX = clamp(model.x + dx, 0, maxX);
+    var nextY = clamp(model.y + dy, 0, maxY);
+    setElementPosition(model.id, nextX, nextY);
+    syncResizeHandles();
+    syncPropertiesPanel();
+  }
+
+  document.addEventListener("keydown", function (e) {
+    if (!window.AppState.ui.selectedId) return;
+    if (isTextEditingTarget(e.target)) return;
+
+    if (e.key === "Delete" || e.key === "Backspace") {
+      var id = window.AppState.ui.selectedId;
+      clearSelection();
+      removeResizeHandles();
+      removeElementById(id);
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "ArrowLeft") {
+      moveSelectedBy(-KEY_STEP, 0);
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "ArrowRight") {
+      moveSelectedBy(KEY_STEP, 0);
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      moveSelectedBy(0, -KEY_STEP);
+      e.preventDefault();
+      return;
+    }
+
+    if (e.key === "ArrowDown") {
+      moveSelectedBy(0, KEY_STEP);
+      e.preventDefault();
+    }
+  });
+
+  if (layersRoot) {
+    layersRoot.addEventListener("pointerdown", function (e) {
+      var btn = e.target.closest("button");
+      if (btn && btn.dataset && btn.dataset.action && btn.dataset.id) {
+        e.preventDefault();
+        if (btn.dataset.action === "forward") moveLayerForward(btn.dataset.id);
+        if (btn.dataset.action === "backward") moveLayerBackward(btn.dataset.id);
+        return;
+      }
+
+      var row = e.target.closest(".layer-item");
+      if (!row) return;
+      var id = row.dataset.id;
+      selectById(id);
+      syncResizeHandles();
+      renderLayers();
+      syncPropertiesPanel();
+      e.preventDefault();
+    });
+  }
+
   canvas.addEventListener("pointerdown", function (e) {
     var el = e.target.closest(".ll-element");
     if (!el) return;
@@ -371,6 +684,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   canvas.addEventListener("pointerdown", function () {
     syncResizeHandles();
+    renderLayers();
+    syncPropertiesPanel();
   });
 
   function addElement(type) {
@@ -405,6 +720,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.AppState.elements.push(element);
     renderElement(element);
+    applyZIndices();
+    renderLayers();
+    syncPropertiesPanel();
   }
 
   if (rectBtn) {
@@ -418,4 +736,8 @@ document.addEventListener("DOMContentLoaded", function () {
       addElement("text");
     });
   }
+
+  applyZIndices();
+  renderLayers();
+  syncPropertiesPanel();
 });

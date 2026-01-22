@@ -68,9 +68,122 @@ body.is-dragging {
   min-width: 0;
 }
 
+.layers {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.layers__title {
+  padding: 10px 10px 8px;
+  font-size: 12px;
+  color: #bdbdbd;
+  border-bottom: 1px solid #252525;
+}
+
+.layers__list {
+  flex: 1;
+  overflow: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.layer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 8px;
+  border: 1px solid #252525;
+  border-radius: 8px;
+  background: #171717;
+}
+
+.layer-item.is-active {
+  border-color: #22c55e;
+}
+
+.layer-item__label {
+  min-width: 0;
+  font-size: 13px;
+  color: #e6e6e6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.layer-item__actions {
+  display: flex;
+  gap: 6px;
+}
+
+.layer-btn {
+  appearance: none;
+  border: 1px solid #2a2a2a;
+  background: #202020;
+  color: #e6e6e6;
+  border-radius: 8px;
+  padding: 6px 8px;
+  font-size: 12px;
+}
+
 .panel--right {
   border-right: 0;
   border-left: 1px solid #252525;
+}
+
+.props {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.props__title {
+  padding: 10px 10px 8px;
+  font-size: 12px;
+  color: #bdbdbd;
+  border-bottom: 1px solid #252525;
+}
+
+.props__form {
+  padding: 10px;
+}
+
+.props__fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.props__row {
+  display: grid;
+  grid-template-columns: 92px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.props__label {
+  font-size: 12px;
+  color: #cfcfcf;
+}
+
+.props__input {
+  width: 100%;
+  height: 34px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid #2a2a2a;
+  background: #111;
+  color: #e6e6e6;
+  font-size: 13px;
+}
+
+.props__input[type="color"] {
+  padding: 0;
 }
 
 .stage {
@@ -139,12 +252,26 @@ body.is-dragging {
 
 @media (max-width: 640px) {
   .workspace {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr;
+    display: flex;
+    flex-direction: column;
   }
 
-  .panel {
-    display: none;
+  .panel--right {
+    display: block;
+    order: 3;
+    border-left: 0;
+    border-top: 1px solid #252525;
+    height: 260px;
+  }
+  .panel--left {
+    order: 2;
+    border-right: 0;
+    border-top: 1px solid #252525;
+    height: 220px;
+  }
+
+  .stage {
+    order: 1;
   }
 
   .topbar {
