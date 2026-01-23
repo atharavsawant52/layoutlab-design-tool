@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LayoutLab</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="topbar" aria-label="Top toolbar">
+      <div class="topbar__left">
+        <span class="brand">LayoutLab</span>
+      </div>
+      <div class="topbar__center">
+        <button type="button" class="toolbtn" id="create-rect">Rectangle</button>
+        <button type="button" class="toolbtn" id="create-text">Text</button>
+        <button type="button" class="toolbtn" id="create-circle">Circle</button>
+        <button type="button" class="toolbtn" id="create-line">Line</button>
+        <button type="button" class="toolbtn" id="create-image">Image</button>
+        <button type="button" class="toolbtn" id="create-button">Button</button>
+        <button type="button" class="toolbtn" id="snap-toggle">Snap: Off</button>
+        <input class="toolbtn" id="grid-size" type="number" min="1" step="1" inputmode="numeric" value="10" />
+        <button type="button" class="toolbtn" id="zoom-out">-</button>
+        <button type="button" class="toolbtn" id="zoom-reset">100%</button>
+        <button type="button" class="toolbtn" id="zoom-in">+</button>
+        <button type="button" class="toolbtn" id="align-left">Left</button>
+        <button type="button" class="toolbtn" id="align-center">Center</button>
+        <button type="button" class="toolbtn" id="align-right">Right</button>
+        <button type="button" class="toolbtn" id="align-top">Top</button>
+        <button type="button" class="toolbtn" id="align-middle">Middle</button>
+        <button type="button" class="toolbtn" id="align-bottom">Bottom</button>
+      </div>
+      <div class="topbar__right">
+        <button type="button" class="toolbtn" id="export-json">Export JSON</button>
+        <button type="button" class="toolbtn" id="export-html">Export HTML</button>
+        <button type="button" class="toolbtn" id="open-guide">Guide</button>
+      </div>
+    </header>
+
+    <div class="workspace">
+      <aside class="panel panel--left" aria-label="Left panel">
+        <div class="layers" aria-label="Layers">
+          <div class="layers__title">Layers</div>
+          <div class="layers__list" id="layers"></div>
+        </div>
+      </aside>
+
+      <main class="stage" aria-label="Design stage">
+        <div class="stage__canvas" id="canvas">
+
+          <div class="empty-state" id="empty-state" aria-hidden="true">
+            <div class="empty-state__art" aria-hidden="true">
+              <div class="empty-state__shape empty-state__shape--a"></div>
+              <div class="empty-state__shape empty-state__shape--b"></div>
+              <div class="empty-state__shape empty-state__shape--c"></div>
+            </div>
+            <div class="empty-state__title">Start by adding a rectangle or text</div>
+            <div class="empty-state__hint">Use the toolbar above, then drag and resize on the canvas.</div>
+          </div>
+
+        </div>
+      </main>
+
+      <aside class="panel panel--right" aria-label="Right panel">
+        <div class="props" aria-label="Properties">
+          <div class="props__title">Properties</div>
+          <form class="props__form" id="props-form">
+            <fieldset class="props__fieldset" id="props-fieldset" disabled>
+              <label class="props__row">
+                <span class="props__label">Width</span>
+                <input class="props__input" id="prop-width" type="number" min="0" step="1" inputmode="numeric" />
+              </label>
+              <label class="props__row">
+                <span class="props__label">Height</span>
+                <input class="props__input" id="prop-height" type="number" min="0" step="1" inputmode="numeric" />
+              </label>
+              <label class="props__row">
+                <span class="props__label">Background</span>
+                <input class="props__input" id="prop-bg" type="color" />
+              </label>
+              <label class="props__row" id="prop-text-row" hidden>
+                <span class="props__label">Text</span>
+                <input class="props__input" id="prop-text" type="text" />
+              </label>
+              <label class="props__row" id="prop-image-row" hidden>
+                <span class="props__label">Image</span>
+                <input class="props__input" id="prop-image" type="file" accept="image/*" />
+              </label>
+            </fieldset>
+          </form>
+        </div>
+      </aside>
+    </div>
+
+    <div class="welcome" id="welcome" aria-hidden="true">
+      <div class="welcome__backdrop" data-welcome-close></div>
+      <div class="welcome__panel" role="dialog" aria-modal="true" aria-label="Welcome to LayoutLab">
+        <div class="welcome__title">Welcome to LayoutLab</div>
+        <div class="welcome__subtitle">A fast visual editor for building clean layout mockups in your browser.</div>
+        <ul class="welcome__tips">
+          <li>Add a rectangle or text from the toolbar</li>
+          <li>Drag to move, use corner handles to resize</li>
+          <li>Shift + click to multi-select and move groups</li>
+          <li>Use Ctrl + Z / Ctrl + Y for undo and redo</li>
+        </ul>
+        <div class="welcome__actions">
+          <button type="button" class="toolbtn" id="start-designing">Start Designing</button>
+        </div>
+        <div class="welcome__note">This appears only once per browser.</div>
+      </div>
+    </div>
+
+    <div class="guide" id="guide" aria-hidden="true">
+      <div class="guide__backdrop" data-guide-close></div>
+      <aside class="guide__panel" role="dialog" aria-modal="true" aria-label="LayoutLab Guide">
+        <header class="guide__header">
+          <div class="guide__title">LayoutLab Guide</div>
+          <button type="button" class="toolbtn" id="close-guide">Close</button>
+        </header>
+        <div class="guide__content">
+          <section class="guide__section">
+            <h2 class="guide__h2">Introduction</h2>
+            <p class="guide__p">LayoutLab is a DOM-based visual editor for building simple layout mockups quickly. It focuses on fast placement, sizing, layering, and export—without needing a design tool.</p>
+            <p class="guide__p">Typical workflow: create elements, select and adjust, use layers and alignment tools, then export the result.</p>
+          </section>
+
+          <section class="guide__section">
+            <h2 class="guide__h2">Creating Elements</h2>
+            <div class="guide__grid">
+              <div>
+                <h3 class="guide__h3">Rectangle</h3>
+                <p class="guide__p">Use the <strong>Rectangle</strong> button to add a block element to the canvas.</p>
+              </div>
+              <div>
+                <h3 class="guide__h3">Text</h3>
+                <p class="guide__p">Use the <strong>Text</strong> button to add editable text. You can update content using the Properties panel.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="guide__section">
+            <h2 class="guide__h2">Selection & Editing</h2>
+            <ul class="guide__list">
+              <li><strong>Single selection</strong>: click an element.</li>
+              <li><strong>Multi-selection</strong>: hold <span class="keycap">Shift</span> and click elements to add/remove them from the selection.</li>
+              <li><strong>Dragging</strong>: drag the selected element(s) to move.</li>
+              <li><strong>Resizing</strong>: use corner handles on a selected element. For multi-selection, resize the bounding box to scale selected items.</li>
+              <li><strong>Layers / z-index</strong>: use the Layers panel to reorder elements using Up/Down.</li>
+            </ul>
+          </section>
+
+          <section class="guide__section">
+            <h2 class="guide__h2">Properties Panel</h2>
+            <ul class="guide__list">
+              <li><strong>Width & Height</strong>: edit size values.</li>
+              <li><strong>Background</strong>: set background color.</li>
+              <li><strong>Text</strong>: for text elements, edit content.</li>
+              <li>When multiple elements are selected, properties are disabled to avoid accidental bulk edits.</li>
+            </ul>
+          </section>
+
+          <section class="guide__section">
+            <h2 class="guide__h2">Keyboard Shortcuts</h2>
+            <div class="guide__table">
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Delete</span> <span class="keycap">Backspace</span></div>
+                <div class="guide__desc">Delete selected element(s)</div>
+              </div>
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Arrow Keys</span></div>
+                <div class="guide__desc">Move selection by a fixed step</div>
+              </div>
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Ctrl</span> <span class="keycap">Z</span></div>
+                <div class="guide__desc">Undo</div>
+              </div>
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Ctrl</span> <span class="keycap">Y</span> / <span class="keycap">Ctrl</span> <span class="keycap">Shift</span> <span class="keycap">Z</span></div>
+                <div class="guide__desc">Redo</div>
+              </div>
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Ctrl</span> <span class="keycap">D</span></div>
+                <div class="guide__desc">Duplicate primary selected element</div>
+              </div>
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Ctrl</span> <span class="keycap">+</span> / <span class="keycap">Ctrl</span> <span class="keycap">-</span></div>
+                <div class="guide__desc">Zoom in / out</div>
+              </div>
+              <div class="guide__row">
+                <div class="guide__keys"><span class="keycap">Ctrl</span> <span class="keycap">0</span></div>
+                <div class="guide__desc">Reset zoom</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="guide__section">
+            <h2 class="guide__h2">Advanced Tools</h2>
+            <ul class="guide__list">
+              <li><strong>Snap to grid</strong>: toggle snap and set grid size to place elements precisely without manual micro-adjustments.</li>
+              <li><strong>Alignment</strong>: aligns selected elements relative to the selection bounding box.</li>
+              <li><strong>Zoom</strong>: zoom the canvas for detail work while keeping pointer accuracy.</li>
+            </ul>
+          </section>
+
+          <section class="guide__section">
+            <h2 class="guide__h2">Save & Export</h2>
+            <ul class="guide__list">
+              <li><strong>Auto save</strong>: changes are saved locally in your browser (localStorage).</li>
+              <li><strong>Export JSON</strong>: download the layout state as JSON.</li>
+              <li><strong>Export HTML</strong>: download a standalone HTML file that reproduces the canvas.</li>
+            </ul>
+          </section>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="statusbar" aria-label="Status bar">
+      <span class="statusbar__text">Ready</span>
+    </footer>
+  </div>
+
+  <script src="./js/state.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+</html>

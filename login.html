@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login • LayoutLab</title>
+  <link rel="stylesheet" href="./css/home.css" />
+</head>
+<body class="auth-page">
+  <header class="home-nav">
+    <div class="home-nav__inner">
+      <a class="home-nav__brand" href="./index.html" aria-label="LayoutLab Home"><span class="home-nav__logo">LayoutLab</span></a>
+      <nav class="home-nav__menu" aria-label="Primary">
+        <a class="home-nav__link" href="./index.html#features">Features</a>
+        <a class="home-nav__link" href="./index.html#guide">Guide</a>
+        <a class="home-nav__cta" href="./editor.html">Open Editor</a>
+        <a class="home-nav__link" href="./signup.html">Sign Up</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="home">
+    <section class="section">
+      <div class="section__inner">
+        <header class="section__header">
+          <h1 class="section__title">Login</h1>
+          <p class="section__subtitle">UI-only demo. Submitting redirects to the editor.</p>
+        </header>
+
+        <form class="auth-form" id="auth-form" action="./editor.html">
+          <label class="auth-form__row">
+            <span class="auth-form__label">Email</span>
+            <input class="auth-form__input" type="email" name="email" autocomplete="email" required />
+          </label>
+          <label class="auth-form__row">
+            <span class="auth-form__label">Password</span>
+            <input class="auth-form__input" type="password" name="password" autocomplete="current-password" required />
+          </label>
+          <div class="auth-form__actions">
+            <button class="btn btn--primary" type="submit">Login</button>
+            <a class="btn btn--ghost" href="./signup.html">Create account</a>
+          </div>
+          <div class="auth-form__note">No backend, no validation beyond browser defaults.</div>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/auth.js"></script>
+</body>
+</html>

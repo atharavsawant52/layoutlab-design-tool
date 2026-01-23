@@ -1,74 +1,586 @@
 <!doctype html>
 <html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LayoutLab</title>
-  <link rel="stylesheet" href="./css/style.css" />
-</head>
-<body>
-  <div id="app" class="app">
-    <header class="topbar" aria-label="Top toolbar">
-      <div class="topbar__left">
-        <span class="brand">LayoutLab</span>
-      </div>
-      <div class="topbar__center">
-        <button type="button" class="toolbtn" id="create-rect">Rectangle</button>
-        <button type="button" class="toolbtn" id="create-text">Text</button>
-      </div>
-      <div class="topbar__right">
-        <button type="button" class="toolbtn" id="export-json">Export JSON</button>
-        <button type="button" class="toolbtn" id="export-html">Export HTML</button>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LayoutLab | Browser-Based Layout Editor</title>
+    <link rel="stylesheet" href="./css/home.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="home-nav" id="top">
+      <div class="home-nav__inner">
+        <a
+          class="home-nav__brand"
+          href="./index.html"
+          aria-label="LayoutLab Home"
+        >
+          <div class="home-nav__logo">
+            <svg
+              class="logo-icon"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 3H10V10H3V3Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M14 3H21V10H14V3Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M3 14H10V21H3V14Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M14 14H21V21H14V14Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+            </svg>
+            <span class="home-nav__logo-text">LayoutLab</span>
+          </div>
+        </a>
+
+        <button
+          class="home-nav__toggle"
+          type="button"
+          id="nav-toggle"
+          aria-expanded="false"
+          aria-controls="nav-menu"
+        >
+          <span class="toggle-line"></span>
+          <span class="toggle-line"></span>
+          <span class="toggle-line"></span>
+        </button>
+
+        <nav class="home-nav__menu" id="nav-menu" aria-label="Primary">
+          <a class="home-nav__link" href="#features">
+            <i class="fas fa-star"></i> Features
+          </a>
+          <a class="home-nav__link" href="#product">
+            <i class="fas fa-cube"></i> Product
+          </a>
+          <a class="home-nav__link" href="#guide">
+            <i class="fas fa-book"></i> Guide
+          </a>
+          <a class="home-nav__link" href="./login.html">
+            <i class="fas fa-sign-in-alt"></i> Login
+          </a>
+          <a class="home-nav__cta" href="./editor.html">
+            <i class="fas fa-bolt"></i> Open Editor
+          </a>
+          <a class="home-nav__cta home-nav__cta--alt" href="./signup.html">
+            <i class="fas fa-user-plus"></i> Sign Up
+          </a>
+        </nav>
       </div>
     </header>
 
-    <div class="workspace">
-      <aside class="panel panel--left" aria-label="Left panel">
-        <div class="layers" aria-label="Layers">
-          <div class="layers__title">Layers</div>
-          <div class="layers__list" id="layers"></div>
+    <main class="home">
+      <section class="hero" id="product">
+        <div class="hero__inner">
+          <div class="hero__copy">
+            <div class="hero__badge">
+              <span class="badge-text">No Installation Required</span>
+            </div>
+            <h1 class="hero__title">
+              Design, Iterate, Export. All in Your Browser.
+            </h1>
+            <p class="hero__subtitle">
+              LayoutLab is a fast, browser-based layout editor that helps you
+              create clean mockups with drag-and-drop, layers, alignment tools,
+              and instant export—no downloads, no signup required.
+            </p>
+            <div class="hero__actions">
+              <a class="btn btn--primary" href="./editor.html">
+                <i class="fas fa-play-circle"></i> Launch Editor
+              </a>
+              <a class="btn btn--ghost" href="#features">
+                <i class="fas fa-list"></i> View Features
+              </a>
+            </div>
+            <div class="hero__meta">
+              <div class="meta-item">
+                <i class="fas fa-shield-alt"></i> No account required to start
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-bolt"></i> Works entirely in your browser
+              </div>
+              <div class="meta-item">
+                <i class="fas fa-save"></i> Auto-saves your work
+              </div>
+            </div>
+          </div>
+          <div class="hero__visual">
+            <div class="mock">
+              <div class="mock__top">
+                <div class="mock-dot"></div>
+                <div class="mock-dot"></div>
+                <div class="mock-dot"></div>
+              </div>
+              <div class="mock__body">
+                <div class="mock__toolbar">
+                  <div class="mock-tool"></div>
+                  <div class="mock-tool"></div>
+                  <div class="mock-tool"></div>
+                  <div class="mock-tool mock-tool--active"></div>
+                  <div class="mock-tool"></div>
+                </div>
+                <div class="mock__canvas">
+                  <div class="mock__element mock__element--primary"></div>
+                  <div class="mock__element mock__element--secondary"></div>
+                  <div class="mock__element mock__element--tertiary"></div>
+                  <div class="mock__element mock__element--text"></div>
+                  <div class="mock__grid"></div>
+                </div>
+                <div class="mock__layers">
+                  <div class="mock-layer">
+                    <div class="mock-layer__color"></div>
+                    <div class="mock-layer__text">Header</div>
+                  </div>
+                  <div class="mock-layer mock-layer--active">
+                    <div class="mock-layer__color"></div>
+                    <div class="mock-layer__text">Card Container</div>
+                  </div>
+                  <div class="mock-layer">
+                    <div class="mock-layer__color"></div>
+                    <div class="mock-layer__text">Button</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </aside>
+      </section>
 
-      <main class="stage" aria-label="Design stage">
-        <div class="stage__canvas" id="canvas">
+      <section class="section" id="features">
+        <div class="section__inner">
+          <header class="section__header">
+            <div class="section__badge">Powerful Features</div>
+            <h2 class="section__title">Built for Real Design Workflow</h2>
+            <p class="section__subtitle">
+              Everything you need to iterate quickly, with the controls you
+              expect in a modern design tool.
+            </p>
+          </header>
 
+          <div class="feature-grid">
+            <div class="feature">
+              <div class="feature__icon">
+                <i class="fas fa-mouse-pointer"></i>
+              </div>
+              <div class="feature__text">
+                <h3 class="feature__title">Visual Editing</h3>
+                <p class="feature__desc">
+                  Create rectangles and text, drag and resize with handles, and
+                  manage stacking using a layers list. Intuitive controls for
+                  precise layout design.
+                </p>
+              </div>
+              <div class="feature__visual" aria-hidden="true">
+                <div class="placeholder placeholder--edit">
+                  <div class="placeholder-element"></div>
+                  <div class="placeholder-element"></div>
+                  <div class="placeholder-handle"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature">
+              <div class="feature__icon">
+                <i class="fas fa-bolt"></i>
+              </div>
+              <div class="feature__text">
+                <h3 class="feature__title">Productivity Tools</h3>
+                <p class="feature__desc">
+                  Undo/redo history, keyboard shortcuts, and multi-selection so
+                  you can work at speed. Copy/paste between elements and
+                  duplicate with ease.
+                </p>
+              </div>
+              <div class="feature__visual" aria-hidden="true">
+                <div class="placeholder placeholder--shortcuts">
+                  <div class="shortcut">⌘Z</div>
+                  <div class="shortcut">⌘C</div>
+                  <div class="shortcut">⌘V</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature">
+              <div class="feature__icon">
+                <i class="fas fa-ruler-combined"></i>
+              </div>
+              <div class="feature__text">
+                <h3 class="feature__title">Precision & Control</h3>
+                <p class="feature__desc">
+                  Snap-to-grid, selection-based alignment tools, and zoom for
+                  detail work—without losing pointer accuracy. Pixel-perfect
+                  positioning.
+                </p>
+              </div>
+              <div class="feature__visual" aria-hidden="true">
+                <div class="placeholder placeholder--grid">
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                  <div class="grid-line"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="feature">
+              <div class="feature__icon">
+                <i class="fas fa-file-export"></i>
+              </div>
+              <div class="feature__text">
+                <h3 class="feature__title">Export & Persistence</h3>
+                <p class="feature__desc">
+                  Auto-save to localStorage and export as JSON or standalone
+                  HTML for sharing and handoff. Cloud sync available with
+                  account.
+                </p>
+              </div>
+              <div class="feature__visual" aria-hidden="true">
+                <div class="placeholder placeholder--export">
+                  <div class="export-icon"><i class="fas fa-download"></i></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="stat__number">100%</div>
+              <div class="stat__label">Browser-Based</div>
+            </div>
+            <div class="stat">
+              <div class="stat__number">15+</div>
+              <div class="stat__label">Keyboard Shortcuts</div>
+            </div>
+            <div class="stat">
+              <div class="stat__number">∞</div>
+              <div class="stat__label">Undo/Redo Steps</div>
+            </div>
+            <div class="stat">
+              <div class="stat__number">5</div>
+              <div class="stat__label">Export Formats</div>
+            </div>
+          </div>
         </div>
-      </main>
+      </section>
 
-      <aside class="panel panel--right" aria-label="Right panel">
-        <div class="props" aria-label="Properties">
-          <div class="props__title">Properties</div>
-          <form class="props__form" id="props-form">
-            <fieldset class="props__fieldset" id="props-fieldset" disabled>
-              <label class="props__row">
-                <span class="props__label">Width</span>
-                <input class="props__input" id="prop-width" type="number" min="0" step="1" inputmode="numeric" />
-              </label>
-              <label class="props__row">
-                <span class="props__label">Height</span>
-                <input class="props__input" id="prop-height" type="number" min="0" step="1" inputmode="numeric" />
-              </label>
-              <label class="props__row">
-                <span class="props__label">Background</span>
-                <input class="props__input" id="prop-bg" type="color" />
-              </label>
-              <label class="props__row" id="prop-text-row" hidden>
-                <span class="props__label">Text</span>
-                <input class="props__input" id="prop-text" type="text" />
-              </label>
-            </fieldset>
-          </form>
+      <section class="section section--alt" id="guide">
+        <div class="section__inner">
+          <header class="section__header">
+            <div class="section__badge">Learning Resources</div>
+            <h2 class="section__title">Guide & Documentation</h2>
+            <p class="section__subtitle">
+              Open the in-app documentation panel for a full walkthrough and
+              shortcut reference. Start designing in minutes.
+            </p>
+          </header>
+
+          <div class="callout">
+            <div class="callout__icon">
+              <i class="fas fa-graduation-cap"></i>
+            </div>
+            <div class="callout__text">
+              <div class="callout__title">
+                Looking for shortcuts and workflows?
+              </div>
+              <div class="callout__desc">
+                The editor includes a product-style Guide panel with sections
+                for selection, properties, shortcuts, snap, alignment, zoom,
+                save, and export. Interactive tutorials available.
+              </div>
+            </div>
+            <div class="callout__actions">
+              <a class="btn btn--primary" href="./editor.html">
+                <i class="fas fa-external-link-alt"></i> Open Editor
+              </a>
+              <a class="btn btn--ghost" href="./signup.html">
+                <i class="fas fa-user-plus"></i> Try Sign Up UI
+              </a>
+            </div>
+          </div>
+
+          <div class="guide-grid">
+            <div class="guide-card">
+              <div class="guide-card__icon">
+                <i class="fas fa-keyboard"></i>
+              </div>
+              <h3 class="guide-card__title">Keyboard Shortcuts</h3>
+              <p class="guide-card__desc">
+                Speed up your workflow with comprehensive keyboard controls for
+                all common actions.
+              </p>
+            </div>
+            <div class="guide-card">
+              <div class="guide-card__icon">
+                <i class="fas fa-video"></i>
+              </div>
+              <h3 class="guide-card__title">Video Tutorials</h3>
+              <p class="guide-card__desc">
+                Step-by-step video guides covering everything from basic shapes
+                to complex layouts.
+              </p>
+            </div>
+            <div class="guide-card">
+              <div class="guide-card__icon">
+                <i class="fas fa-question-circle"></i>
+              </div>
+              <h3 class="guide-card__title">Interactive Help</h3>
+              <p class="guide-card__desc">
+                Contextual help bubbles appear when you hover over unfamiliar
+                controls.
+              </p>
+            </div>
+          </div>
         </div>
-      </aside>
-    </div>
+      </section>
 
-    <footer class="statusbar" aria-label="Status bar">
-      <span class="statusbar__text">Ready</span>
+      <section class="section" id="auth">
+        <div class="section__inner">
+          <header class="section__header">
+            <div class="section__badge">Authentication UI</div>
+            <h2 class="section__title">Fake Login / Sign Up</h2>
+            <p class="section__subtitle">
+              UI-only pages for a realistic product feel. Submitting redirects
+              to the editor with demo functionality.
+            </p>
+          </header>
+          <div class="auth-links">
+            <a class="btn btn--primary" href="./login.html">
+              <i class="fas fa-sign-in-alt"></i> Login Demo
+            </a>
+            <a class="btn btn--ghost" href="./signup.html">
+              <i class="fas fa-user-plus"></i> Sign Up Demo
+            </a>
+            <a class="btn btn--outline" href="./editor.html">
+              <i class="fas fa-play"></i> Continue as Guest
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="section cta-section">
+        <div class="section__inner">
+          <div class="cta">
+            <div class="cta__content">
+              <h2 class="cta__title">Ready to design your next layout?</h2>
+              <p class="cta__desc">
+                Join thousands of designers who use LayoutLab for quick mockups
+                and prototypes.
+              </p>
+            </div>
+            <div class="cta__actions">
+              <a class="btn btn--primary btn--large" href="./editor.html">
+                <i class="fas fa-rocket"></i> Start Creating Free
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="home-footer">
+      <div class="home-footer__inner">
+        <div class="home-footer__brand">
+          <div class="home-footer__logo">
+            <svg
+              class="logo-icon"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M3 3H10V10H3V3Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M14 3H21V10H14V3Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M3 14H10V21H3V14Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+              <path
+                d="M14 14H21V21H14V14Z"
+                stroke="currentColor"
+                stroke-width="2"
+              />
+            </svg>
+            <span class="home-footer__name">LayoutLab</span>
+          </div>
+          <div class="home-footer__desc">
+            A lightweight visual editor for quick layout exploration, powered by
+            plain HTML, CSS, and JavaScript.
+          </div>
+          <div class="home-footer__social">
+            <a
+              href="https://github.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub"
+            >
+              <i class="fab fa-github"></i>
+            </a>
+            <a
+              href="https://twitter.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Twitter"
+            >
+              <i class="fab fa-twitter"></i>
+            </a>
+            <a
+              href="https://discord.com/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Discord"
+            >
+              <i class="fab fa-discord"></i>
+            </a>
+          </div>
+        </div>
+        <nav class="home-footer__links" aria-label="Footer">
+          <div class="footer-link-group">
+            <h4 class="footer-link-title">Product</h4>
+            <a href="#features">Features</a>
+            <a href="#guide">Guide</a>
+            <a href="./editor.html">Editor</a>
+            <a href="#auth">Login/Signup</a>
+          </div>
+          <div class="footer-link-group">
+            <h4 class="footer-link-title">Resources</h4>
+            <a href="#">Documentation</a>
+            <a href="#">Tutorials</a>
+            <a href="#">Community</a>
+            <a href="#">Blog</a>
+          </div>
+          <div class="footer-link-group">
+            <h4 class="footer-link-title">Legal</h4>
+            <a href="#">Privacy Policy</a>
+            <a href="#">Terms of Service</a>
+            <a href="#">Cookies</a>
+            <a href="#">License</a>
+          </div>
+        </nav>
+        <div class="home-footer__meta">
+          <div class="footer-copyright">
+            © <span id="year"></span> LayoutLab. All rights reserved.
+          </div>
+          <div class="footer-version">Version 2.1.0</div>
+        </div>
+      </div>
     </footer>
-  </div>
 
-  <script src="./js/state.js"></script>
-  <script src="./js/main.js"></script>
-</body>
+    <script src="./js/home.js"></script>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      // Mobile nav toggle
+      const navToggle = document.getElementById("nav-toggle");
+      const navMenu = document.getElementById("nav-menu");
+
+      if (navToggle) {
+        navToggle.addEventListener("click", () => {
+          const isExpanded = navToggle.getAttribute("aria-expanded") === "true";
+          navToggle.setAttribute("aria-expanded", !isExpanded);
+          document.body.classList.toggle("nav-open");
+        });
+      }
+
+      document
+        .querySelectorAll(".home-nav__link, .home-nav__cta")
+        .forEach((link) => {
+          link.addEventListener("click", () => {
+            navToggle.setAttribute("aria-expanded", "false");
+            document.body.classList.remove("nav-open");
+          });
+        });
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          const href = this.getAttribute("href");
+
+          if (href === "#") return;
+
+          const targetElement = document.querySelector(href);
+
+          if (targetElement) {
+            e.preventDefault();
+            window.scrollTo({
+              top: targetElement.offsetTop - 80,
+              behavior: "smooth",
+            });
+          }
+        });
+      });
+
+      window.addEventListener("scroll", () => {
+        const nav = document.querySelector(".home-nav");
+        if (window.scrollY > 50) {
+          nav.style.background = "rgba(12, 12, 13, 0.95)";
+          nav.style.backdropFilter = "blur(15px)";
+        } else {
+          nav.style.background = "rgba(12, 12, 13, 0.7)";
+          nav.style.backdropFilter = "blur(10px)";
+        }
+      });
+
+      const observerOptions = {
+        threshold: 0.5,
+      };
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const statNumbers = entry.target.querySelectorAll(".stat__number");
+            statNumbers.forEach((statNumber) => {
+              const target = statNumber.textContent;
+              statNumber.textContent = "0";
+
+              let counter = 0;
+              const increment =
+                target === "∞" ? 1 : Math.floor(parseInt(target) / 20);
+              const timer = setInterval(() => {
+                counter += increment;
+                if (counter >= parseInt(target) || target === "∞") {
+                  statNumber.textContent = target;
+                  clearInterval(timer);
+                } else {
+                  statNumber.textContent = counter;
+                }
+              }, 50);
+            });
+
+            observer.unobserve(entry.target);
+          }
+        });
+      }, observerOptions);
+
+      const statsSection = document.querySelector(".stats");
+      if (statsSection) {
+        observer.observe(statsSection);
+      }
+    </script>
+  </body>
 </html>

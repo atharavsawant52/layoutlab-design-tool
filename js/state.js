@@ -2,7 +2,10 @@ window.AppState = {
   doc: null,
   elements: [],
   ui: {
-    selectedId: null,
+    selectedIds: [],
+    snapEnabled: false,
+    gridSize: 10,
+    zoom: 1,
     tool: "select"
   },
   counters: {
